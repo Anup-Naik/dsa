@@ -43,7 +43,7 @@ fn pat5(n: u8) {
 }
 fn pat6(n: u8) {
     for i in 0..n {
-        for _j in 0..n - i {
+        for _j in 0..n - i - 1 {
             print!(" ");
         }
         for _j in n - i - 1..n + i {
@@ -51,6 +51,74 @@ fn pat6(n: u8) {
         }
         for _j in n + i..2 * n - 1 {
             print!(" ");
+        }
+        println!();
+    }
+}
+
+fn pat7(n: u8) {
+    for i in 0..n {
+        for _j in 0..i {
+            print!(" ");
+        }
+        for _j in i..2 * n - i - 1 {
+            print!("*");
+        }
+        for _j in n - i..2 * n - 1 {
+            print!(" ");
+        }
+        println!();
+    }
+}
+
+fn pat8(n: u8) {
+    pat6(n);
+    pat7(n);
+}
+
+fn pat9(n: u8) {
+    let mut stars: u8;
+    for i in 0..2 * n - 1 {
+        stars = i + 1;
+        if i >= n {
+            stars = 2 * n - i - 1;
+        }
+        for _j in 0..stars {
+            print!("*");
+        }
+        println!();
+    }
+}
+fn pat10(n: u8) {
+    for i in 0..n {
+        for j in 0..=i {
+            if i % 2 == 0 {
+                if j % 2 == 0 {
+                    print!("1");
+                } else {
+                    print!("0");
+                }
+            } else {
+                if j % 2 == 0 {
+                    print!("0");
+                } else {
+                    print!("1");
+                }
+            }
+        }
+        println!();
+    }
+}
+fn pat11(n: u8) {
+    for i in 0..n {
+        for j in 0..i + 1 {
+            print!("{}", j + 1);
+        }
+        for _j in i + 1..2 * n - 1 - i {
+            print!(" ");
+        }
+        for j in  2 * n - 1 - i..2*n{
+            print!("{}",2*n-j);
         }
         println!();
     }
@@ -66,4 +134,9 @@ fn main() {
     pat4(n);
     pat5(n);
     pat6(n);
+    pat7(n);
+    pat8(n);
+    pat9(n);
+    pat10(n);
+    pat11(n);
 }
