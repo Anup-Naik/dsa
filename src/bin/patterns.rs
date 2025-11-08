@@ -165,7 +165,84 @@ fn pat16(n: u8) {
         println!();
     }
 }
+fn pat17(n: u8) {
+    for i in 0..n {
+        for _j in 0..n - i {
+            print!(" ");
+        }
+        for j in 0..i + 1 {
+            print!("{}", char::from(65 + j));
+        }
+        for j in (0..i).rev() {
+            print!("{}", char::from(65 + j));
+        }
+        for _j in 0..n - i {
+            print!(" ");
+        }
+        println!();
+    }
+}
+fn pat18(n: u8) {
+    for i in 0..n {
+        for j in char::from(65 + n - 1 - i)..=char::from(65 + n - 1) {
+            print!("{}", j);
+        }
+        println!();
+    }
+}
+fn pat19(n: u8) {
+    for i in 0..n {
+        for _j in 0..n - i {
+            print!("*");
+        }
+        for _j in 0..2 * i {
+            print!(" ");
+        }
+        for _j in 0..n - i {
+            print!("*");
+        }
+        println!();
+    }
 
+    for i in 0..n {
+        for _j in 0..=i {
+            print!("*");
+        }
+        for _j in 0..2 * n - 2 * (i + 1) {
+            print!(" ");
+        }
+        for _j in 0..=i {
+            print!("*");
+        }
+        println!();
+    }
+}
+fn pat20(n: u8) {
+    for i in 0..n {
+        for _j in 0..=i {
+            print!("*");
+        }
+        for _j in 0..2 * n - 2 * (i + 1) {
+            print!(" ");
+        }
+        for _j in 0..=i {
+            print!("*");
+        }
+        println!();
+    }
+    for i in 1..n {
+        for _j in 0..n - i {
+            print!("*");
+        }
+        for _j in 0..2 * i {
+            print!(" ");
+        }
+        for _j in 0..n - i {
+            print!("*");
+        }
+        println!();
+    }
+}
 fn main() {
     let mut input = String::new();
     io::stdin().read_line(&mut input).unwrap();
@@ -187,4 +264,8 @@ fn main() {
     pat14(n);
     pat15(n);
     pat16(n);
+    pat17(n);
+    pat18(n);
+    pat19(n);
+    pat20(n);
 }
