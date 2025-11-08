@@ -43,6 +43,14 @@ fn pat5(n: u8) {
 }
 fn pat6(n: u8) {
     for i in 0..n {
+        for j in 0..n - i {
+            print!("{}", j + 1);
+        }
+        println!("");
+    }
+}
+fn pat7(n: u8) {
+    for i in 0..n {
         for _j in 0..n - i - 1 {
             print!(" ");
         }
@@ -56,7 +64,7 @@ fn pat6(n: u8) {
     }
 }
 
-fn pat7(n: u8) {
+fn pat8(n: u8) {
     for i in 0..n {
         for _j in 0..i {
             print!(" ");
@@ -71,12 +79,12 @@ fn pat7(n: u8) {
     }
 }
 
-fn pat8(n: u8) {
-    pat6(n);
+fn pat9(n: u8) {
     pat7(n);
+    pat8(n);
 }
 
-fn pat9(n: u8) {
+fn pat10(n: u8) {
     let mut stars: u8;
     for i in 0..2 * n - 1 {
         stars = i + 1;
@@ -89,7 +97,7 @@ fn pat9(n: u8) {
         println!();
     }
 }
-fn pat10(n: u8) {
+fn pat11(n: u8) {
     for i in 0..n {
         for j in 0..=i {
             if i % 2 == 0 {
@@ -109,7 +117,7 @@ fn pat10(n: u8) {
         println!();
     }
 }
-fn pat11(n: u8) {
+fn pat12(n: u8) {
     for i in 0..n {
         for j in 0..i + 1 {
             print!("{}", j + 1);
@@ -117,12 +125,47 @@ fn pat11(n: u8) {
         for _j in i + 1..2 * n - 1 - i {
             print!(" ");
         }
-        for j in  2 * n - 1 - i..2*n{
-            print!("{}",2*n-j);
+        for j in 2 * n - 1 - i..2 * n {
+            print!("{}", 2 * n - j);
         }
         println!();
     }
 }
+fn pat13(n: u8) {
+    let mut count = 1;
+    for i in 0..n {
+        for _j in 0..=i {
+            print!("{} ", count);
+            count += 1;
+        }
+        println!();
+    }
+}
+fn pat14(n: u8) {
+    for i in 0..n {
+        for j in 'A'..=char::from('A' as u8 + i) {
+            print!("{}", j);
+        }
+        println!();
+    }
+}
+fn pat15(n: u8) {
+    for i in (0..n).rev() {
+        for j in 'A'..=char::from('A' as u8 + i) {
+            print!("{}", j);
+        }
+        println!();
+    }
+}
+fn pat16(n: u8) {
+    for i in 0..n {
+        for _j in 0..=i {
+            print!("{}", char::from(65 + i));
+        }
+        println!();
+    }
+}
+
 fn main() {
     let mut input = String::new();
     io::stdin().read_line(&mut input).unwrap();
@@ -139,4 +182,9 @@ fn main() {
     pat9(n);
     pat10(n);
     pat11(n);
+    pat12(n);
+    pat13(n);
+    pat14(n);
+    pat15(n);
+    pat16(n);
 }
