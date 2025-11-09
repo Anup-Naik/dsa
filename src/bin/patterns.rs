@@ -1,4 +1,4 @@
-use std::io;
+use std::{cmp::min, io};
 
 fn pat1(n: u8) {
     for _i in 0..n {
@@ -243,6 +243,31 @@ fn pat20(n: u8) {
         println!();
     }
 }
+fn pat21(n: u8) {
+    for i in 0..n {
+        for j in 0..n {
+            if i == 0 || j == 0 || i == n - 1 || j == n - 1 {
+                print!("*");
+            } else {
+                print!(" ");
+            }
+        }
+        println!();
+    }
+}
+fn pat22(n: u8) {
+    for i in 0..2 * n - 1 {
+        for j in 0..2 * n - 1 {
+            let top = j;
+            let bottom = 2 * n - 2 - j;
+            let left = i;
+            let right = 2 * n - 2 - i;
+
+            print!("{}", n - min(min(top, bottom), min(left, right)));
+        }
+        println!();
+    }
+}
 fn main() {
     let mut input = String::new();
     io::stdin().read_line(&mut input).unwrap();
@@ -268,4 +293,6 @@ fn main() {
     pat18(n);
     pat19(n);
     pat20(n);
+    pat21(n);
+    pat22(n);
 }
