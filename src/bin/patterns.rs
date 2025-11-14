@@ -258,10 +258,10 @@ fn pat21(n: u8) {
 fn pat22(n: u8) {
     for i in 0..2 * n - 1 {
         for j in 0..2 * n - 1 {
-            let top = j;
-            let bottom = 2 * n - 2 - j;
-            let left = i;
-            let right = 2 * n - 2 - i;
+            let top = i;
+            let bottom = 2 * n - 2 - i;
+            let left = j;
+            let right = 2 * n - 2 - j;
 
             print!("{}", n - min(min(top, bottom), min(left, right)));
         }
