@@ -1,3 +1,31 @@
+use colored::Colorize;
+use rand::Rng;
+use std::i32;
+use std::sync::mpsc;
+use std::thread::{self, JoinHandle};
+use std::time::{Duration, Instant};
+
+// Custom Types
+type Msg = (String, Duration);
+
+// Input Helper
+// fn take_array_input() -> Vec<i32> {
+//     let mut buf = String::new();
+//     println!("Enter the size of input");
+//     std::io::stdin()
+//         .read_line(&mut buf)
+//         .expect("Error Reading n");
+
+//     let n: usize = buf.trim().parse().expect("Error Parsing Size");
+//     println!("Enter the Elements");
+//     let v: Vec<i32> = std::io::stdin()
+//         .lines()
+//         .map(|v| v.unwrap().parse().expect("Error Parsing Element"))
+//         .take(n)
+//         .collect();
+//     v
+// }
+
 // Select minimum value and insert from beginning
 // Time complexity O(n^2) - Best, Avg, Worst
 fn selection_sort(mut v: Vec<i32>) -> Vec<i32> {
@@ -50,6 +78,8 @@ fn insertion_sort(mut v: Vec<i32>) -> Vec<i32> {
 
 // Divide array in half until only one element is left and start merging
 // Time Complexity O(nlogn) - Best, Avg, Worst
+
+// Merge two sorted arrays
 fn merge(left: Vec<i32>, right: Vec<i32>) -> Vec<i32> {
     let mut arr: Vec<i32> = vec![];
     let (mut l, mut r) = (0, 0);
@@ -83,24 +113,13 @@ fn merge_sort(v: &[i32]) -> Vec<i32> {
     merge(left, right)
 }
 
-use std::thread::{self, JoinHandle};
-use std::time::Instant;
-fn main() {
-    let mut buf = String::new();
-    println!("Enter the size of input");
-    std::io::stdin()
-        .read_line(&mut buf)
-        .expect("Error Reading n");
-
-    let n: usize = buf.trim().parse().expect("Error Parsing Size");
-  println!("Enter the Elements");
-    let v: Vec<i32> = std::io::stdin()
-        .lines()
-        .map(|v| v.unwrap().parse().expect("Error Parsing Element"))
-        .take(n)
-        .collect();
-
-    println!("Original Array: {:?}", v);
+// Run Sorting Algorithms
+fn run_sorting_algorithms(n: usize) -> (usize, Vec<Msg>) {
+    // Creating random input array of size n
+    let mut rng = rand::rng();
+    let v: Vec<i32> = (0..n).map(|_| rng.random_range(0..i32::MAX)).collect();
+    // println!("Original Array: {:?}", v);
+    // println!();
     let sorting_algorithms = [
         ("Selection Sort", selection_sort as fn(Vec<i32>) -> Vec<i32>),
         ("Bubble Sort", bubble_sort as fn(Vec<i32>) -> Vec<i32>),
@@ -108,20 +127,46 @@ fn main() {
         ("Merge Sort", |v: Vec<i32>| merge_sort(&v)),
     ];
     let mut join_handles: Vec<JoinHandle<_>> = vec![];
+    let (tx, rx) = mpsc::channel::<Msg>();
     for (name, sort) in sorting_algorithms {
         let v = v.clone();
+        let transmitter = tx.clone();
         let jh = thread::spawn(move || {
             let start = Instant::now();
-            let arr = sort(v);
+            let _arr = sort(v);
             let tt = start.elapsed();
-            println!(
-                "{} Done. Time Taken: {:?}. Sorted Array: {:?}",
-                name, tt, arr
-            );
+            // println!(
+            //     "{} Done. Time Taken: {:?}.\n Sorted Array: {:?}",
+            //     name, tt, arr
+            // );
+            // println!();
+            transmitter
+                .send((name.to_owned(), tt))
+                .expect("Error Sending Message");
         });
         join_handles.push(jh);
     }
     for j in join_handles {
         j.join().unwrap();
     }
+    let outputs: Vec<Msg> = rx.iter().take(4).collect();
+    (n, outputs)
+}
+fn main() {
+    let (input_size, output) = run_sorting_algorithms(1000);
+    println!(
+        "For Input Size {} the Results are ",
+        input_size.to_string().green().bold()
+    );
+    println!("{:─>45}", "");
+    println!(
+        "|{:<20} | {:<20}|",
+        "Sorting Algorithm".green().bold(),
+        "Time Taken".green().bold()
+    );
+    println!("{:─>45}", "");
+    for (name, time) in output {
+        println!("|{:<20} | {:<20?}|", name, time);
+    }
+    println!("{:─>45}", "");
 }
