@@ -9,22 +9,43 @@ use std::time::{Duration, Instant};
 type Msg = (String, Duration);
 
 // Input Helper
-// fn take_array_input() -> Vec<i32> {
-//     let mut buf = String::new();
-//     println!("Enter the size of input");
-//     std::io::stdin()
-//         .read_line(&mut buf)
-//         .expect("Error Reading n");
+fn take_array_input() -> Vec<usize> {
+    let mut buf = String::new();
+    println!("Enter the no of inputs");
+    std::io::stdin()
+        .read_line(&mut buf)
+        .expect("Error Reading n");
 
-//     let n: usize = buf.trim().parse().expect("Error Parsing Size");
-//     println!("Enter the Elements");
-//     let v: Vec<i32> = std::io::stdin()
-//         .lines()
-//         .map(|v| v.unwrap().parse().expect("Error Parsing Element"))
-//         .take(n)
-//         .collect();
-//     v
-// }
+    let n: usize = buf.trim().parse().expect("Error Parsing Size");
+    println!("Enter the size of inputs (n)");
+    let v: Vec<usize> = std::io::stdin()
+        .lines()
+        .map(|v| v.unwrap().parse().expect("Error Parsing Element"))
+        .take(n)
+        .collect();
+    v
+}
+
+// Printer
+fn printer(input_size: usize, output: Vec<Msg>) {
+    println!();
+    println!(
+        "For Input Size n = {} the Results are ",
+        input_size.to_string().green().bold()
+    );
+    println!("{:->45}", "");
+    println!(
+        "|{:<20} | {:<20}|",
+        "Sorting Algorithm".green().bold(),
+        "Time Taken".green().bold()
+    );
+    println!("{:->45}", "");
+    for (name, time) in output {
+        println!("|{:<20} | {:<20?}|", name, time);
+    }
+    println!("{:->45}", "");
+    println!();
+}
 
 // Select minimum value and insert from beginning
 // Time complexity O(n^2) - Best, Avg, Worst
@@ -153,20 +174,13 @@ fn run_sorting_algorithms(n: usize) -> (usize, Vec<Msg>) {
     (n, outputs)
 }
 fn main() {
-    let (input_size, output) = run_sorting_algorithms(1000);
-    println!(
-        "For Input Size {} the Results are ",
-        input_size.to_string().green().bold()
-    );
-    println!("{:─>45}", "");
-    println!(
-        "|{:<20} | {:<20}|",
-        "Sorting Algorithm".green().bold(),
-        "Time Taken".green().bold()
-    );
-    println!("{:─>45}", "");
-    for (name, time) in output {
-        println!("|{:<20} | {:<20?}|", name, time);
+    println!();
+    println!("{:-^50}","Compare Sorting Algorithms".magenta().bold().italic());
+    println!("{}","The longer the input size the longer it will take.\nSo try to enter input(n) sizes under 50000.".red());
+    println!();
+    let v = take_array_input();
+    for i in v {
+        let (n, o) = run_sorting_algorithms(i);
+        printer(n, o);
     }
-    println!("{:─>45}", "");
 }
