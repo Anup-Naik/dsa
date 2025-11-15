@@ -11,13 +11,13 @@ type Msg = (String, Duration);
 // Input Helper
 fn take_array_input() -> Vec<usize> {
     let mut buf = String::new();
-    println!("Enter the no of inputs");
+    println!("{}","Enter the no of inputs".yellow());
     std::io::stdin()
         .read_line(&mut buf)
         .expect("Error Reading n");
 
     let n: usize = buf.trim().parse().expect("Error Parsing Size");
-    println!("Enter the size of inputs (n)");
+    println!("{}","Enter the size of inputs (n)".yellow());
     let v: Vec<usize> = std::io::stdin()
         .lines()
         .map(|v| v.unwrap().parse().expect("Error Parsing Element"))
@@ -173,9 +173,13 @@ fn run_sorting_algorithms(n: usize) -> (usize, Vec<Msg>) {
     let outputs: Vec<Msg> = rx.iter().take(4).collect();
     (n, outputs)
 }
-fn main() {
+
+fn console_app() {
     println!();
-    println!("{:-^50}","Compare Sorting Algorithms".magenta().bold().italic());
+    println!(
+        "{:-^50}",
+        "Compare Sorting Algorithms".bright_magenta().bold().italic()
+    );
     println!("{}","The longer the input size the longer it will take.\nSo try to enter input(n) sizes under 50000.".red());
     println!();
     let v = take_array_input();
@@ -183,4 +187,8 @@ fn main() {
         let (n, o) = run_sorting_algorithms(i);
         printer(n, o);
     }
+    println!("{:-^50}", "END".magenta());
+}
+fn main() {
+    console_app();
 }
