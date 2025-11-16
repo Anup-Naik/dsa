@@ -7,7 +7,7 @@ use std::sync::mpsc;
 use std::thread::{self, JoinHandle};
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
-// Custom Types
+// Types
 struct Msg(String, Duration);
 
 // Input Helper
@@ -51,6 +51,7 @@ fn printer(input_size: usize, output: &Vec<Msg>) {
 
 // Plot Graph
 fn plotter(data: Vec<(usize, Vec<Msg>)>) {
+    // Data Transformation
     let mut data_mp: HashMap<String, Vec<(usize, f64)>> = HashMap::new();
     for (n, output) in data {
         for msg in output {
@@ -62,6 +63,8 @@ fn plotter(data: Vec<(usize, Vec<Msg>)>) {
         }
     }
     // println!("{:#?}", data_mp);
+
+    // Path to Store Plots
     let img_name = format!(
         "img/chart-{}.png",
         SystemTime::now()
@@ -69,21 +72,44 @@ fn plotter(data: Vec<(usize, Vec<Msg>)>) {
             .unwrap()
             .as_secs()
     );
-    let root = BitMapBackend::new(&img_name, (600, 400)).into_drawing_area();
+
+    // Initialize Plot on BitMap Backend using PNG Format
+    let root = BitMapBackend::new(&img_name, (1920, 1080)).into_drawing_area();
     root.fill(&WHITE).unwrap();
 
+    // Create Context
     let mut ctx = ChartBuilder::on(&root)
         .caption("Compare Sorting Algorithms", ("Ariel", 25))
         .margin(20)
-        .set_left_and_bottom_label_area_size(40)
-        .build_cartesian_2d(-20..20, 0..100)
+        .set_left_and_bottom_label_area_size(60)
+        .build_cartesian_2d(0usize..100000usize, 0f64..100f64)
         .unwrap();
-    ctx.configure_mesh().draw().unwrap();
-    ctx.draw_series(LineSeries::new((-10..11).map(|x| (x, x * x)), &BLACK))
-        .unwrap()
-        .label("y=x^2")
-        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &BLACK));
+
+    // Draw Mesh
+    ctx.configure_mesh()
+        .x_desc("Input Size (n)") //axes Descriptons and Styling
+        .y_desc("Time Taken in Seconds (s)")
+        .axis_desc_style(("Ariel", 25))
+        .draw()
+        .unwrap();
+    for (label, points) in data_mp {
+        // Color Map
+        let color = match label.as_str() {
+            "Merge Sort" => RED,
+            "Selection Sort" => MAGENTA,
+            "Bubble Sort" => CYAN,
+            "Insertion Sort" => BLUE,
+            _ => BLACK,
+        };
+        // Draw Lines
+        ctx.draw_series(LineSeries::new(points, &color))
+            .unwrap()
+            .label(label)
+            .legend(move |(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &color));
+    }
+    // Line Series Config
     ctx.configure_series_labels()
+    .label_font(("Ariel",20))
         .border_style(&BLACK)
         .background_style(&WHITE.mix(0.8))
         .draw()
