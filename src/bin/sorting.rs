@@ -1,23 +1,25 @@
 use colored::Colorize;
+use plotters::prelude::*;
 use rand::Rng;
+use std::collections::HashMap;
 use std::i32;
 use std::sync::mpsc;
 use std::thread::{self, JoinHandle};
-use std::time::{Duration, Instant};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 // Custom Types
-type Msg = (String, Duration);
+struct Msg(String, Duration);
 
 // Input Helper
 fn take_array_input() -> Vec<usize> {
     let mut buf = String::new();
-    println!("{}","Enter the no of inputs".yellow());
+    println!("{}", "Enter the no of inputs".yellow());
     std::io::stdin()
         .read_line(&mut buf)
         .expect("Error Reading n");
 
     let n: usize = buf.trim().parse().expect("Error Parsing Size");
-    println!("{}","Enter the size of inputs (n)".yellow());
+    println!("{}", "Enter the size of inputs (n)".yellow());
     let v: Vec<usize> = std::io::stdin()
         .lines()
         .map(|v| v.unwrap().parse().expect("Error Parsing Element"))
@@ -27,7 +29,7 @@ fn take_array_input() -> Vec<usize> {
 }
 
 // Printer
-fn printer(input_size: usize, output: Vec<Msg>) {
+fn printer(input_size: usize, output: &Vec<Msg>) {
     println!();
     println!(
         "For Input Size n = {} the Results are ",
@@ -40,11 +42,52 @@ fn printer(input_size: usize, output: Vec<Msg>) {
         "Time Taken".green().bold()
     );
     println!("{:->45}", "");
-    for (name, time) in output {
-        println!("|{:<20} | {:<20?}|", name, time);
+    for r in output {
+        println!("|{:<20} | {:<20?}|", r.0, r.1);
     }
     println!("{:->45}", "");
     println!();
+}
+
+// Plot Graph
+fn plotter(data: Vec<(usize, Vec<Msg>)>) {
+    let mut data_mp: HashMap<String, Vec<(usize, f64)>> = HashMap::new();
+    for (n, output) in data {
+        for msg in output {
+            if let Some(v) = data_mp.get_mut(&msg.0) {
+                v.push((n, msg.1.as_secs_f64()));
+            } else {
+                data_mp.insert(msg.0, vec![(n, msg.1.as_secs_f64())]);
+            }
+        }
+    }
+    // println!("{:#?}", data_mp);
+    let img_name = format!(
+        "img/chart-{}.png",
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs()
+    );
+    let root = BitMapBackend::new(&img_name, (600, 400)).into_drawing_area();
+    root.fill(&WHITE).unwrap();
+
+    let mut ctx = ChartBuilder::on(&root)
+        .caption("Compare Sorting Algorithms", ("Ariel", 25))
+        .margin(20)
+        .set_left_and_bottom_label_area_size(40)
+        .build_cartesian_2d(-20..20, 0..100)
+        .unwrap();
+    ctx.configure_mesh().draw().unwrap();
+    ctx.draw_series(LineSeries::new((-10..11).map(|x| (x, x * x)), &BLACK))
+        .unwrap()
+        .label("y=x^2")
+        .legend(|(x, y)| PathElement::new(vec![(x, y), (x + 20, y)], &BLACK));
+    ctx.configure_series_labels()
+        .border_style(&BLACK)
+        .background_style(&WHITE.mix(0.8))
+        .draw()
+        .unwrap();
 }
 
 // Select minimum value and insert from beginning
@@ -102,22 +145,24 @@ fn insertion_sort(mut v: Vec<i32>) -> Vec<i32> {
 
 // Merge two sorted arrays
 fn merge(left: Vec<i32>, right: Vec<i32>) -> Vec<i32> {
-    let mut arr: Vec<i32> = vec![];
+    let mut arr: Vec<i32> = Vec::with_capacity(left.len() + right.len());
     let (mut l, mut r) = (0, 0);
-    while l < left.len() || r < right.len() {
-        if l == left.len() {
-            arr.push(right[r]);
-            r += 1;
-        } else if r == right.len() {
-            arr.push(left[l]);
-            l += 1
-        } else if left[l] < right[r] {
+    while l < left.len() && r < right.len() {
+        if left[l] < right[r] {
             arr.push(left[l]);
             l += 1
         } else {
             arr.push(right[r]);
             r += 1;
         }
+    }
+    while l < left.len() {
+        arr.push(left[l]);
+        l += 1
+    }
+    while r < right.len() {
+        arr.push(right[r]);
+        r += 1;
     }
     arr
 }
@@ -128,9 +173,10 @@ fn merge_sort(v: &[i32]) -> Vec<i32> {
         return v.to_vec();
     }
     let mid = n / 2;
+    // Divide
     let left = merge_sort(&v[0..mid]);
     let right = merge_sort(&v[mid..]);
-
+    // Conquer/Merge
     merge(left, right)
 }
 
@@ -162,7 +208,7 @@ fn run_sorting_algorithms(n: usize) -> (usize, Vec<Msg>) {
             // );
             // println!();
             transmitter
-                .send((name.to_owned(), tt))
+                .send(Msg(name.to_owned(), tt))
                 .expect("Error Sending Message");
         });
         join_handles.push(jh);
@@ -178,17 +224,25 @@ fn console_app() {
     println!();
     println!(
         "{:-^50}",
-        "Compare Sorting Algorithms".bright_magenta().bold().italic()
+        "Compare Sorting Algorithms"
+            .bright_magenta()
+            .bold()
+            .italic()
     );
-    println!("{}","The longer the input size the longer it will take.\nSo try to enter input(n) sizes under 50000.".red());
+    println!("{}","The longer the input size the longer it will take.\nSo try to enter input(n) sizes in range 1000 to 10000.".red());
     println!();
     let v = take_array_input();
+    let mut data = vec![];
     for i in v {
         let (n, o) = run_sorting_algorithms(i);
-        printer(n, o);
+        printer(n, &o);
+        data.push((n, o));
     }
     println!("{:-^50}", "END".magenta());
+    plotter(data);
 }
+
 fn main() {
     console_app();
+    // plotter();
 }
