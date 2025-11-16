@@ -49,21 +49,25 @@ fn printer(input_size: usize, output: &Vec<Msg>) {
     println!();
 }
 
-// Plot Graph
-fn plotter(data: Vec<(usize, Vec<Msg>)>) {
-    // Data Transformation
+// Data Transformation
+fn transform_data(data: Vec<(usize, Vec<Msg>)>) -> HashMap<String, Vec<(usize, f64)>> {
     let mut data_mp: HashMap<String, Vec<(usize, f64)>> = HashMap::new();
     for (n, output) in data {
         for msg in output {
             if let Some(v) = data_mp.get_mut(&msg.0) {
-                v.push((n, msg.1.as_secs_f64()));
+                v.push((n, msg.1.as_secs_f64() * 1_000_000f64));
             } else {
-                data_mp.insert(msg.0, vec![(n, msg.1.as_secs_f64())]);
+                data_mp.insert(msg.0, vec![(n, msg.1.as_secs_f64() * 1_000_000f64)]);
             }
         }
     }
     // println!("{:#?}", data_mp);
+    data_mp
+}
 
+// Plot Graph
+fn plotter(data: Vec<(usize, Vec<Msg>)>) {
+    let data_mp = transform_data(data);
     // Path to Store Plots
     let img_name = format!(
         "img/chart-{}.png",
@@ -81,14 +85,14 @@ fn plotter(data: Vec<(usize, Vec<Msg>)>) {
     let mut ctx = ChartBuilder::on(&root)
         .caption("Compare Sorting Algorithms", ("Ariel", 25))
         .margin(20)
-        .set_left_and_bottom_label_area_size(60)
-        .build_cartesian_2d(0usize..100000usize, 0f64..100f64)
+        .set_left_and_bottom_label_area_size(100)
+        .build_cartesian_2d(0usize..10_000usize, 0f64..1_00_000f64) // Ranges of axes
         .unwrap();
 
     // Draw Mesh
     ctx.configure_mesh()
         .x_desc("Input Size (n)") //axes Descriptons and Styling
-        .y_desc("Time Taken in Seconds (s)")
+        .y_desc("Time Taken (t) in microseconds (µs)")
         .axis_desc_style(("Ariel", 25))
         .draw()
         .unwrap();
@@ -109,7 +113,7 @@ fn plotter(data: Vec<(usize, Vec<Msg>)>) {
     }
     // Line Series Config
     ctx.configure_series_labels()
-    .label_font(("Ariel",20))
+        .label_font(("Ariel", 20))
         .border_style(&BLACK)
         .background_style(&WHITE.mix(0.8))
         .draw()
@@ -255,7 +259,7 @@ fn console_app() {
             .bold()
             .italic()
     );
-    println!("{}","The longer the input size the longer it will take.\nSo try to enter input(n) sizes in range 1000 to 10000.".red());
+    println!("{}","The longer the input size the longer it will take.\nSo try to enter input(n) sizes in range 1 to 5000.".red());
     println!();
     let v = take_array_input();
     let mut data = vec![];
@@ -270,5 +274,4 @@ fn console_app() {
 
 fn main() {
     console_app();
-    // plotter();
 }
