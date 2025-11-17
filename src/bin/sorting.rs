@@ -103,6 +103,7 @@ fn plotter(data: Vec<(usize, Vec<Msg>)>) {
             "Selection Sort" => MAGENTA,
             "Bubble Sort" => CYAN,
             "Insertion Sort" => BLUE,
+            "Quick Sort" => GREEN,
             _ => BLACK,
         };
         // Draw Lines
@@ -210,6 +211,33 @@ fn merge_sort(v: &[i32]) -> Vec<i32> {
     merge(left, right)
 }
 
+// Quick Sort
+fn partition(v: &mut [i32], lo: usize, hi: usize) -> usize {
+    let mut rng = rand::rng();
+    v.swap(rng.random_range(lo..hi), hi);
+    let pivot = v[hi];
+    let mut i = lo;
+    for j in lo..hi {
+        if v[j] <= pivot {
+            v.swap(j, i);
+            i += 1;
+        }
+    }
+    v.swap(i, hi);
+    i
+}
+
+fn quick_sort(v: &mut [i32], lo: usize, hi: usize) {
+    if hi <= lo {
+        return;
+    }
+    let pivot = partition(v, lo, hi);
+    if pivot > 0 {
+        quick_sort(v, lo, pivot - 1);
+    }
+    quick_sort(v, pivot + 1, hi);
+}
+
 // Run Sorting Algorithms
 fn run_sorting_algorithms(n: usize) -> (usize, Vec<Msg>) {
     // Creating random input array of size n
@@ -222,6 +250,11 @@ fn run_sorting_algorithms(n: usize) -> (usize, Vec<Msg>) {
         ("Bubble Sort", bubble_sort as fn(Vec<i32>) -> Vec<i32>),
         ("Insertion Sort", insertion_sort as fn(Vec<i32>) -> Vec<i32>),
         ("Merge Sort", |v: Vec<i32>| merge_sort(&v)),
+        ("Quick Sort", |mut v: Vec<i32>| {
+            let hi = v.len() - 1;
+            quick_sort(&mut v, 0, hi);
+            v
+        }),
     ];
     let mut join_handles: Vec<JoinHandle<_>> = vec![];
     let (tx, rx) = mpsc::channel::<Msg>();
@@ -246,7 +279,7 @@ fn run_sorting_algorithms(n: usize) -> (usize, Vec<Msg>) {
     for j in join_handles {
         j.join().unwrap();
     }
-    let outputs: Vec<Msg> = rx.iter().take(4).collect();
+    let outputs: Vec<Msg> = rx.iter().take(5).collect();
     (n, outputs)
 }
 
