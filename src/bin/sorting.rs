@@ -83,7 +83,7 @@ fn plotter(data: Vec<(usize, Vec<Msg>)>) {
 
     // Create Context
     let mut ctx = ChartBuilder::on(&root)
-        .caption("Compare Sorting Algorithms", ("Ariel", 25))
+        .caption("Time Complexity Chart of Sorting Algorithms", ("Ariel", 25))
         .margin(20)
         .set_left_and_bottom_label_area_size(100)
         .build_cartesian_2d(0usize..10_000usize, 0f64..1_00_000f64) // Ranges of axes
@@ -288,7 +288,7 @@ fn console_app() {
     println!();
     println!(
         "{:-^50}",
-        "Time Complexity Chart of Sorting Algorithms"
+        "Compare Sorting Algorithms"
             .bright_magenta()
             .bold()
             .italic()
