@@ -214,9 +214,9 @@ fn merge_sort(v: &[i32]) -> Vec<i32> {
 // Quick Sort
 fn partition(v: &mut [i32], lo: usize, hi: usize) -> usize {
     let mut rng = rand::rng();
-    v.swap(rng.random_range(lo..hi), hi);
+    v.swap(rng.random_range(lo..=hi), hi);
     let pivot = v[hi];
-    let mut i = lo;
+    let mut i = lo; // Swapping Position
     for j in lo..hi {
         if v[j] <= pivot {
             v.swap(j, i);
@@ -233,9 +233,10 @@ fn quick_sort(v: &mut [i32], lo: usize, hi: usize) {
     }
     let pivot = partition(v, lo, hi);
     if pivot > 0 {
-        quick_sort(v, lo, pivot - 1);
+        // Prevent underflow of usize if pivot is 0
+        quick_sort(v, lo, pivot - 1); // Less than pivot
     }
-    quick_sort(v, pivot + 1, hi);
+    quick_sort(v, pivot + 1, hi); // Greater than pivot
 }
 
 // Run Sorting Algorithms
@@ -287,7 +288,7 @@ fn console_app() {
     println!();
     println!(
         "{:-^50}",
-        "Compare Sorting Algorithms"
+        "Time Complexity Chart of Sorting Algorithms"
             .bright_magenta()
             .bold()
             .italic()
