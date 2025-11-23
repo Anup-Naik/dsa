@@ -1,9 +1,11 @@
+use std::collections::HashMap;
+
 //Print nums
-fn rec1(n: i32) {
+fn print_nums(n: i32) {
     if n < 1 {
         return;
     };
-    rec1(n - 1);
+    print_nums(n - 1);
     print!("{} ", n);
 }
 
@@ -14,26 +16,38 @@ fn fibo(n: i32) -> i32 {
     }
     fibo(n - 1) + fibo(n - 2)
 }
-use std::collections::HashMap;
 
-fn fib(n: i32, mp: &mut HashMap<i32, i32>) -> i32 {
+fn fibo_memo(n: i32, mp: &mut HashMap<i32, i32>) -> i32 {
     if let Some(result) = mp.get(&n) {
         return result.clone();
     }
     if n <= 1 {
         return n;
     }
-    let result = fib(n - 1, mp) + fib(n - 2, mp);
+    let result = fibo_memo(n - 1, mp) + fibo_memo(n - 2, mp);
     mp.insert(n, result);
     result
 }
+
+// GCD
+fn gcd(mut p: usize, mut q: usize) -> usize {
+    if q <= 0 {
+        return p;
+    };
+    let r = p % q;
+    p = q;
+    q = r;
+    gcd(p, q)
+}
+
 fn main() {
     let mut buf = String::new();
     std::io::stdin().read_line(&mut buf).unwrap();
     let n: i32 = buf.trim().parse().unwrap();
-    rec1(n);
+    print_nums(n);
     println!("Recursive fib - {}", fibo(n as i32));
     let mut mp: HashMap<i32, i32> = HashMap::new();
-    println!("Memoized Recursive fib - {}", fib(6, &mut mp));
+    println!("Memoized Recursive fib - {}", fibo_memo(6, &mut mp));
     println!("{:#?}", mp);
+    println!("GCD of 13 and 17 is {}", gcd(13, 17));
 }
