@@ -165,7 +165,7 @@ fn zeros_to_end(arr: &mut [i32]) -> &[i32] {
     arr
 }
 
-// Union of Arrays
+// Union of Sorted Arrays
 fn union(arr1: &[i32], arr2: &[i32]) -> Vec<i32> {
     let mut union: Vec<i32> = vec![];
     let (mut i, mut j) = (0, 0);
@@ -195,6 +195,26 @@ fn union(arr1: &[i32], arr2: &[i32]) -> Vec<i32> {
         j += 1;
     }
     union
+}
+
+// Intersection of Sorted arrays
+fn intersection(arr1: &[i32], arr2: &[i32]) -> Vec<i32> {
+    let mut intersection: Vec<i32> = vec![];
+    let (mut i, mut j) = (0, 0);
+    while i < arr1.len() && j < arr2.len() {
+        if arr1[i] == arr2[j] {
+            intersection.push(arr1[i]);
+            i += 1;
+            j += 1;
+        } else {
+            if arr1[i] < arr2[j] {
+                i += 1;
+            } else {
+                j += 1;
+            }
+        }
+    }
+    intersection
 }
 fn main() {
     let mut arr = [5, 4, 9, 7, 15, 2, 14];
@@ -242,4 +262,10 @@ fn main() {
         [4, 4, 5, 5, 6],
         union(&[1, 2, 2, 3, 4], &[4, 4, 5, 5, 6])
     );
+    println!(
+        "Intersection of {:?} and {:?} is {:?}",
+        [1, 2, 2, 3, 4],
+        [2, 3, 3, 4, 5],
+        intersection(&[1, 2, 2, 3, 4], &[2, 3, 3, 4, 5])
+    )
 }
