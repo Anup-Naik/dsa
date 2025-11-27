@@ -121,10 +121,92 @@ fn matrix_multiply(a: &Vec<Vec<i32>>, b: &Vec<Vec<i32>>) -> Vec<Vec<i32>> {
     }
     c
 }
+
+// reverse array
+fn reverse_array2(arr: &mut [i32], mut lo: usize, mut hi: usize) {
+    while lo < hi {
+        arr.swap(lo, hi);
+        lo += 1;
+        hi -= 1;
+    }
+}
+// left rotate array by k places
+fn left_rotate_array(arr: &mut [i32], k: usize) -> &[i32] {
+    reverse_array2(arr, 0, k - 1);
+    reverse_array2(arr, k, arr.len() - 1);
+    reverse_array2(arr, 0, arr.len() - 1);
+    arr
+}
+// right rotate array by k places
+fn right_rotate_array(arr: &mut [i32], k: usize) -> &[i32] {
+    reverse_array2(arr, 0, arr.len() - 1);
+    reverse_array2(arr, 0, k - 1);
+    reverse_array2(arr, k, arr.len() - 1);
+    arr
+}
+
+// Move zeros to end of array
+fn zeros_to_end(arr: &mut [i32]) -> &[i32] {
+    let (mut i, mut j) = (0, 0);
+    while j < arr.len() {
+        if arr[i] != 0 {
+            i += 1;
+            j += 1;
+        } else {
+            if arr[j] != 0 {
+                arr.swap(i, j);
+                i += 1;
+                j += 1;
+            } else {
+                j += 1;
+            }
+        }
+    }
+    arr
+}
+
+// Union of Arrays
+fn union(arr1: &[i32], arr2: &[i32]) -> Vec<i32> {
+    let mut union: Vec<i32> = vec![];
+    let (mut i, mut j) = (0, 0);
+    while i < arr1.len() && j < arr2.len() {
+        if arr1[i] <= arr2[j] {
+            if union.len() == 0 || *union.last().unwrap() != arr1[i] {
+                union.push(arr1[i]);
+            }
+            i += 1;
+        } else {
+            if union.len() == 0 || *union.last().unwrap() != arr2[j] {
+                union.push(arr2[j]);
+            }
+            j += 1;
+        }
+    }
+    while i < arr1.len() {
+        if union.len() == 0 || *union.last().unwrap() != arr1[i] {
+            union.push(arr1[i]);
+        }
+        i += 1;
+    }
+    while j < arr2.len() {
+        if union.len() == 0 || *union.last().unwrap() != arr2[j] {
+            union.push(arr2[j]);
+        }
+        j += 1;
+    }
+    union
+}
 fn main() {
     let mut arr = [5, 4, 9, 7, 15, 2, 14];
     let sorted_arr = [-15, -10, 0, 2, 2, 5, 10];
     let mut duplicates = [1, 1, 2, 2, 2, 3, 3, 4, 5, 6, 6];
+    println!(
+        "{:?} Rotate by {} elements --> LEFT{:?}. RIGHT{:?}",
+        [1, 2, 3, 4, 5, 6],
+        4,
+        left_rotate_array(&mut [1, 2, 3, 4, 5, 6], 4),
+        right_rotate_array(&mut [1, 2, 3, 4, 5, 6], 4)
+    );
     println!(
         "Removed Duplicates, Unique Lenght = {} ---> {:?}. ",
         rmv_duplicates(&mut duplicates),
@@ -149,4 +231,15 @@ fn main() {
     let a = vec![vec![1, 2], vec![3, 4]];
     let b = vec![vec![1, 2], vec![3, 4]];
     println!("{:?} * {:?} = {:?}", a, b, matrix_multiply(&a, &b));
+    println!(
+        "Move Zero's to End {:?} ---> {:?}",
+        [1, 0, 2, 3, 2, 0, 0, 4, 5, 1],
+        zeros_to_end(&mut [1, 0, 2, 3, 2, 0, 0, 4, 5, 1])
+    );
+    println!(
+        "Union of {:?} and {:?} is {:?}",
+        [1, 2, 2, 3, 4],
+        [4, 4, 5, 5, 6],
+        union(&[1, 2, 2, 3, 4], &[4, 4, 5, 5, 6])
+    );
 }
